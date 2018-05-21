@@ -1,0 +1,5 @@
+{
+  "name": "Jams API - Development",
+  "secret": "ventana",
+  "db": "mongodb://localhost/jams_dev"
+}

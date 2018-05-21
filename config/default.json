@@ -1,0 +1,6 @@
+{
+  "name": "Jams API",
+  "jwtPrivateKey": "",
+  "secret": "ventana",
+  "db": "mongodb://localhost/jams_api"
+}
