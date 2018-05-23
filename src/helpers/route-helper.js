@@ -57,15 +57,21 @@ export const authorization = (model = '', permission = '') => {
 export const announcementAuth = (model = null, permission = null) => {
   return async (req, res, next) => {
     const user = req.user
+
     const { announcementId } = req.params
 
     if ( user.role.includes('ADMIN')) {
       next()
+      return
     }
 
     if (announcementId) {
       const announcement = await Announcement.findById(req.params.announcementId).populate('project')
-      const exists = announcement.project.personnel.find(personnel => {
+      if(!announcement.project) {
+        next()
+        return
+      }
+      const exists = announcement.project.personnels.find(personnel => {
         return personnel.value.user.toString() === user._id.toString()
       })
 

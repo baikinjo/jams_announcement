@@ -19,37 +19,26 @@ import Announcement from '../models/announcement'
 export const index = async (req, res, next) => {
   let announcements = []
 
-  if (req.user.role.includes('ADMIN')) {
-    announcements = await Announcement.find({}).populate('concreteProviderContact trades.trade trades.children.trade users.user')
-  } else {
-    /** Get only projects with permission */
-    announcements = await Announcement.find({ 'personnels.value.user': req.user._id })
+  switch(req.user.role) {
+  case 'ADMIN':
+    announcements = await Announcement.find({}).populate('createdBy')
+    break
+  default:
+    await Announcement.find({}).populate('project').exec((err, items) => {
+      if(err) return res.json({status: 500, error: err})
+      items.map((item) => {
+        if(!item.project) {
+          announcements.push(item)
+        } else {
+          item.project.personnels.map((person) => {
+            if(person.value.user.toString() === req.user._id.toString()) {
+              announcements.push(item)
+            }
+          })
+        }
+      })
+    })
   }
-  // /** If admin return all */
-  // if (req.user.role.includes('ADMIN')) {
-  //   announcements = await Announcement.find({}).populate('createdBy')
-  // }
-  // else {
-  //   /** Get only projects with permission */
-  //   await Announcement.find({}).populate('project project.personnels.value.user').exec((err, items) => {
-  //     if (err) {
-  //       console.log(err)
-  //     }
-  //     items.map((item) => {
-  //       if (!item.project) {
-  //         announcements.push(item)
-  //       } else {
-  //         item.project.personnels.map(personnel => {
-  //           if (personnel.value.user === req.user._id) {
-  //             announcements.push(item)
-  //           }
-  //         })
-  //       }
-  //     })
-
-  //   })
-
-  // }
   res.status(200).json(announcements)
 }
 
@@ -65,7 +54,8 @@ export const create = async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: 'Announcement Created'
+    message: 'Announcement Created',
+    id: newAnnouncement._id
   })
 }
 
@@ -97,7 +87,6 @@ export const get = async (req, res, next) => {
       { $set: { 'checked.$.readAt': new Date().toISOString() } }
     )
   }
-  console.log(foundAnnouncement.project)
   res.status(200).json(foundAnnouncement)
 }
 
@@ -106,7 +95,7 @@ export const get = async (req, res, next) => {
  */
 export const replace = async (req, res, next) => {
   const { announcementId } = req.value.params
-  const newAnnouncement = req.value.body
+  const newAnnouncement = req.body
 
   Object.assign(announcementId, newAnnouncement)
 
@@ -137,4 +126,13 @@ export const getUsers = async (req, res, next) => {
   const foundAnnouncement = await Announcement.findById(announcementId).populate('checked')
 
   res.status(200).json(foundAnnouncement.checked)
+}
+
+export const projectAnnouncements = async (req, res, next) => {
+  let announcements = []
+  const projectId = req.params.projectId
+
+  announcements = await Announcement.find({ project: projectId })
+
+  res.status(200).json(announcements)
 }

@@ -18,7 +18,7 @@ import * as announcementController from '../controllers/announcements'
 
 /* Helpers ====================================================================================== */
 import { schema } from '../helpers/project-helper'
-import { authorization, announcementAuth, projectAuth, validateBody, validateParam } from '../helpers/route-helper'
+import { authorization, announcementAuth, projectAuth, validateParam } from '../helpers/route-helper'
 import { R, W, U, D, ANNOUCEMENT, passportJWT } from '../helpers/common'
 
 /* Routes ======================================================================================= */
@@ -39,14 +39,15 @@ router.route('/')
 router.route('/:announcementId')
   .get(
     passportJWT,
-    projectAuth(ANNOUCEMENT, R),
+    announcementAuth(ANNOUCEMENT, R),
     validateParam(schema.id, [Announcement], 'announcementId'),
     announcementController.get)
   .put(
     passportJWT,
-    projectAuth(ANNOUCEMENT, U),
+    authorization(),
+    announcementAuth(ANNOUCEMENT, U),
     validateParam(schema.id, [Announcement], 'announcementId'),
-    validateBody(schema.default),
+    // validateBody(schema.default),
     announcementController.replace
   )
   .delete(
@@ -63,6 +64,14 @@ router.route('/:announcementId/users')
     projectAuth(ANNOUCEMENT, R),
     validateParam(schema.id, [Announcement], 'announcementId'),
     announcementController.getUsers
+  )
+
+router.route('/project/:projectId')
+  .get(
+    passportJWT,
+    announcementAuth(ANNOUCEMENT, R),
+    projectAuth(ANNOUCEMENT, R),
+    announcementController.projectAnnouncements
   )
 
 export default router
