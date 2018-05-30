@@ -10,6 +10,7 @@
     "data-entry": "babel-node ./src/tools/data-entry/index.js",
     "data-entry:project-mod": "babel-node ./src/tools/data-entry/project-mod.js",
     "data-entry:trade-from-dash": "babel-node ./src/tools/data-entry/trade-from-dash.js",
+    "data-deletion": "babel-node ./src/tools/data-entry/project-deletion.js",
     "flow": "flow",
     "flow:check": "flow check",
     "test": "jest -i --watchAll"

@@ -64,4 +64,11 @@ router.route('/:projectId/analyze-total-pours')
     projectController.analyzeTotalPours
   )
 
+router.route('/projectfinder/find')
+  .get(
+    passportJWT,
+    projectAuth(PROJECT, R),
+    projectController.findUser
+  )
+
 export default router
