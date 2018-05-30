@@ -32,21 +32,6 @@ export const index = async (req, res, next) => {
   res.status(200).json(projects)
 }
 
-export const findUser = async (req, res, next) => {
-  const projects = []
-
-  await Project.find({}).exec((err, items) => {
-    if(err) console.log(err)
-    items.map((item) => {
-      if(item.users.length > 0) {
-        projects.push(item)
-      }
-    })
-  })
-  console.log(projects.length)
-  res.status(200).json(projects)
-}
-
 /**
  * Create new project
  */
